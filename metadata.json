@@ -1,0 +1,8 @@
+{
+  "name": "Neural OS",
+  "description": "An advanced AI robot control interface featuring real-time data analysis and an intuitive immersive UI design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

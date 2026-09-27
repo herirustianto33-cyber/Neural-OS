@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern UI/UX Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        dark: '#0f172a',
+                        darker: '#020617'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-300 dark:bg-darker dark:text-gray-100 overflow-hidden">
+
+    <div class="flex h-screen w-full">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-white dark:bg-dark border-r border-gray-200 dark:border-gray-800 flex flex-col justify-between transition-all duration-300 transform -translate-x-full md:translate-x-0 fixed md:relative z-50 h-full shadow-xl md:shadow-none">
+            <div>
+                <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                        Nexus UI
+                    </span>
+                    <button id="closeSidebar" class="md:hidden text-gray-500 hover:text-gray-800 dark:hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <nav class="p-4 space-y-2 mt-4">
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 text-primary rounded-xl font-medium transition-all">
+                        <i class="fas fa-border-all"></i> Dashboard
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl font-medium transition-all">
+                        <i class="fas fa-chart-pie"></i> Analytics
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl font-medium transition-all">
+                        <i class="fas fa-users"></i> Customers
+                    </a>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl font-medium transition-all">
+                        <i class="fas fa-wallet"></i> Finance
+                    </a>
+                </nav>
+            </div>
+            <div class="p-4">
+                <div class="glass p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
+                    <h4 class="text-sm font-semibold mb-1">Pro Plan</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Unlock all features</p>
+                    <button class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-xs font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all transform hover:-translate-y-1">
+                        Upgrade Now
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            
+            <!-- Header -->
+            <header class="h-16 glass z-40 sticky top-0 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-4">
+                    <button id="openSidebar" class="md:hidden text-gray-500 hover:text-gray-800 dark:hover:text-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="hidden sm:flex items-center bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2 border border-transparent focus-within:border-primary transition-all">
+                        <i class="fas fa-search text-gray-400 text-sm"></i>
+                        <input type="text" placeholder="Search..." class="bg-transparent border-none outline-none ml-2 text-sm text-gray-700 dark:text-gray-200 w-48">
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button id="themeToggle" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary p-[2px] cursor-pointer transform hover:scale-105 transition-transform">
+                        <img src="https://i.pravatar.cc/150?img=32" alt="Profile" class="w-full h-full rounded-full border-2 border-white dark:border-darker object-cover">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                
+                <div class="mb-8 animate-header">
+                    <h1 class="text-2xl font-bold">Welcome back, Alex 👋</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Here's what's happening with your projects today.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Stat Card 1 -->
+                    <div class="stat-card glass rounded-2xl p-5 hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-green-500 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">+12.5%</span>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Revenue</h3>
+                        <p class="text-2xl font-bold mt-1">$45,231.89</p>
+                    </div>
+
+                    <!-- Stat Card 2 -->
+                    <div class="stat-card glass rounded-2xl p-5 hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-green-500 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">+5.2%</span>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Active Users</h3>
+                        <p class="text-2xl font-bold mt-1">2,420</p>
+                    </div>
+
+                    <!-- Stat Card 3 -->
+                    <div class="stat-card glass rounded-2xl p-5 hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/30 text-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-red-500 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">-1.2%</span>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Conversion Rate</h3>
+                        <p class="text-2xl font-bold mt-1">4.6%</p>
+                    </div>
+
+                    <!-- Stat Card 4 -->
+                    <div class="stat-card glass rounded-2xl p-5 hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-green-500 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">+18.4%</span>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Server Uptime</h3>
+                        <p class="text-2xl font-bold mt-1">99.9%</p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Main Chart -->
+                    <div class="chart-container glass rounded-2xl p-6 lg:col-span-2 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg">Revenue Overview</h3>
+                            <select class="bg-gray-100 dark:bg-gray-800 border-none text-xs rounded-lg px-3 py-2 outline-none cursor-pointer">
+                                <option>This Year</option>
+                                <option>Last Year</option>
+                            </select>
+                        </div>
+                        <div class="relative h-72 w-full">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Doughnut Chart -->
+                    <div class="chart-container glass rounded-2xl p-6 shadow-sm flex flex-col">
+                        <h3 class="font-bold text-lg mb-6">Traffic Sources</h3>
+                        <div class="relative flex-1 w-full flex justify-center items-center">
+                            <canvas id="doughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Table -->
+                <div class="table-container glass rounded-2xl p-6 shadow-sm mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg">Recent Transactions</h3>
+                        <button class="text-sm text-primary font-medium hover:underline">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-gray-500 dark:text-gray-400 text-xs uppercase border-b border-gray-200 dark:border-gray-800">
+                                    <th class="pb-3 font-medium">Customer</th>
+                                    <th class="pb-3 font-medium">Date</th>
+                                    <th class="pb-3 font-medium">Amount</th>
+                                    <th class="pb-3 font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <img src="https://i.pravatar.cc/150?img=11" class="w-8 h-8 rounded-full" alt="Avatar">
+                                        <span class="font-medium">Sarah Jenkins</span>
+                                    </td>
+                                    <td class="py-4 text-gray-500 dark:text-gray-400">Oct 24, 2023</td>
+                                    <td class="py-4 font-medium">$1,200.00</td>
+                                    <td class="py-4">
+                                        <span class="bg-green-100 dark:bg-green-900/30 text-green-600 text-xs px-2 py-1 rounded-full font-medium">Completed</span>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <img src="https://i.pravatar.cc/150?img=68" class="w-8 h-8 rounded-full" alt="Avatar">
+                                        <span class="font-medium">Michael Chen</span>
+                                    </td>
+                                    <td class="py-4 text-gray-500 dark:text-gray-400">Oct 23, 2023</td>
+                                    <td class="py-4 font-medium">$850.50</td>
+                                    <td class="py-4">
+                                        <span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <img src="https://i.pravatar.cc/150?img=47" class="w-8 h-8 rounded-full" alt="Avatar">
+                                        <span class="font-medium">Emma Wilson</span>
+                                    </td>
+                                    <td class="py-4 text-gray-500 dark:text-gray-400">Oct 21, 2023</td>
+                                    <td class="py-4 font-medium">$3,400.00</td>
+                                    <td class="py-4">
+                                        <span class="bg-green-100 dark:bg-green-900/30 text-green-600 text-xs px-2 py-1 rounded-full font-medium">Completed</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+    </div>
+
+    <!-- Interactive Scripts & Animations -->
+    <script>
+        // --- GSAP Animations ---
+        document.addEventListener("DOMContentLoaded", (event) => {
+            // Initial Load Animations
+            const tl = gsap.timeline();
+            
+            tl.from(".animate-header", { y: -20, opacity: 0, duration: 0.6, ease: "power3.out" })
+              .from(".stat-card", { 
+                  y: 30, opacity: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1.2)" 
+              }, "-=0.3")
+              .from(".chart-container", { 
+                  scale: 0.95, opacity: 0, duration: 0.6, stagger: 0.15, ease: "power2.out" 
+              }, "-=0.2")
+              .from(".table-container", { 
+                  y: 20, opacity: 0, duration: 0.5, ease: "power2.out" 
+              }, "-=0.3");
+
+            // Sidebar Hover effects
+            gsap.utils.toArray('.nav-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    gsap.to(item.querySelector('i'), { scale: 1.2, duration: 0.2, ease: "back.out(2)" });
+                });
+                item.addEventListener('mouseleave', () => {
+                    gsap.to(item.querySelector('i'), { scale: 1, duration: 0.2 });
+                });
+            });
+        });
+
+        // --- Theme Toggle Logic ---
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Check local storage or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if(document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                updateChartsTheme(true);
+            } else {
+                localStorage.theme = 'light';
+                updateChartsTheme(false);
+            }
+        });
+
+        // --- Mobile Sidebar Logic ---
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('openSidebar');
+        const closeBtn = document.getElementById('closeSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closeSidebarAction() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300); // match transition duration
+        }
+
+        openBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebarAction);
+        overlay.addEventListener('click', closeSidebarAction);
+
+        // --- Chart.js Implementations ---
+        
+        // Common styling
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+        Chart.defaults.scale.grid.color = document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+        // 1. Line Chart (Revenue)
+        const ctxMain = document.getElementById('mainChart').getContext('2d');
+        
+        // Create Gradient for line chart
+        let gradientMain = ctxMain.createLinearGradient(0, 0, 0, 400);
+        gradientMain.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Primary color
+        gradientMain.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+        const mainChart = new Chart(ctxMain, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [12000, 19000, 15000, 22000, 18000, 28000, 24000, 32000, 29000, 36000, 34000, 45000],
+                    borderColor: '#6366f1',
+                    backgroundColor: gradientMain,
+                    borderWidth: 3,
+                    tension: 0.4, // Smooth curves
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 10,
+                        cornerRadius: 8,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        border: { display: false },
+                        ticks: { callback: function(value) { return '$' + value / 1000 + 'k'; } }
+                    },
+                    x: {
+                        border: { display: false },
+                        grid: { display: false }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+
+        // 2. Doughnut Chart (Traffic)
+        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+        const doughnutChart = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Direct', 'Social', 'Organic', 'Referral'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: [
+                        '#6366f1', // Primary
+                        '#8b5cf6', // Secondary
+                        '#3b82f6', // Blue
+                        '#e2e8f0'  // Slate 200
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' }
+                    }
+                }
+            }
+        });
+
+        // Function to update chart colors when theme changes
+        function updateChartsTheme(isDark) {
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            const tooltipBg = isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(15, 23, 42, 0.9)';
+            const tooltipText = isDark ? '#000' : '#fff';
+
+            // Update Defaults
+            Chart.defaults.color = textColor;
+            Chart.defaults.scale.grid.color = gridColor;
+
+            // Update Main Chart
+            mainChart.options.scales.x.ticks.color = textColor;
+            mainChart.options.scales.y.ticks.color = textColor;
+            mainChart.options.scales.y.grid.color = gridColor;
+            mainChart.options.plugins.tooltip.backgroundColor = tooltipBg;
+            mainChart.options.plugins.tooltip.titleColor = tooltipText;
+            mainChart.options.plugins.tooltip.bodyColor = tooltipText;
+            mainChart.update();
+
+            // Update Doughnut Chart
+            doughnutChart.options.plugins.legend.labels.color = textColor;
+            // Handle the lightest color in doughnut based on theme
+            doughnutChart.data.datasets[0].backgroundColor[3] = isDark ? '#334155' : '#e2e8f0';
+            doughnutChart.update();
+        }
+
+        // Initial setup for doughnut chart color based on starting theme
+        if (document.documentElement.classList.contains('dark')) {
+            updateChartsTheme(true);
+        }
+    </script>
+</body>
+</html>
